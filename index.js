@@ -13,11 +13,15 @@ const {
 } = require('discord.js');
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
 // CONFIGURE AQUI
-client.login(process.env.TOKEN);
 const CARGO_MEMBRO = "1472322818372010070";
 const CARGO_STAFF = "1472322818350776580";
 const CANAL_PAINEL = "1486083438753878016";
@@ -26,24 +30,29 @@ const CANAL_LOG = "1486083691586392236";
 client.once('ready', async () => {
   console.log(`Bot online como ${client.user.tag}`);
 
-  const canal = await client.channels.fetch(CANAL_PAINEL);
+  try {
+    const canal = await client.channels.fetch(CANAL_PAINEL);
 
-  const botao = new ButtonBuilder()
-    .setCustomId('registro')
-    .setLabel('📋 Fazer Registro')
-    .setStyle(ButtonStyle.Danger);
+    const botao = new ButtonBuilder()
+      .setCustomId('registro')
+      .setLabel('📋 Fazer Registro')
+      .setStyle(ButtonStyle.Danger);
 
-  const row = new ActionRowBuilder().addComponents(botao);
+    const row = new ActionRowBuilder().addComponents(botao);
 
-  canal.send({
-    content: '🔥 TROPA DA COREIA - RECRUTAMENTO 🔥\nClique no botão para iniciar.',
-    components: [row]
-  });
+    await canal.send({
+      content: '🔥 TROPA DA COREIA - RECRUTAMENTO 🔥\nClique no botão para iniciar.',
+      components: [row]
+    });
+
+  } catch (err) {
+    console.log("Erro ao enviar painel:", err);
+  }
 });
 
 client.on(Events.InteractionCreate, async interaction => {
 
-  // BOTÃO
+  // BOTÃO REGISTRO
   if (interaction.isButton() && interaction.customId === 'registro') {
 
     const modal = new ModalBuilder()
@@ -94,7 +103,7 @@ client.on(Events.InteractionCreate, async interaction => {
       .setLabel('❌ Recusar')
       .setStyle(ButtonStyle.Danger);
 
-    canal.send({
+    await canal.send({
       content: `📋 NOVO REGISTRO\n\n👤 Nome: ${nome}\n🆔 ID: ${id}`,
       components: [new ActionRowBuilder().addComponents(aprovar, recusar)]
     });
@@ -115,16 +124,17 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if (interaction.customId.startsWith('aprovar')) {
       await membro.roles.add(CARGO_MEMBRO);
-      log.send(`✅ ${membro.user.tag} aprovado por ${interaction.user.tag}`);
+      await log.send(`✅ ${membro.user.tag} aprovado por ${interaction.user.tag}`);
       await interaction.channel.delete();
     }
 
     if (interaction.customId.startsWith('recusar')) {
-      log.send(`❌ ${membro.user.tag} recusado por ${interaction.user.tag}`);
+      await log.send(`❌ ${membro.user.tag} recusado por ${interaction.user.tag}`);
       await interaction.channel.delete();
     }
   }
 
 });
 
-client.login(TOKEN);
+// 🔥 IMPORTANTE (DEIXA SÓ ISSO)
+client.login(process.env.TOKEN);
