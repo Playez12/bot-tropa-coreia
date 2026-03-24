@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const {
   Client,
   GatewayIntentBits,
@@ -21,7 +23,7 @@ const client = new Client({
   ]
 });
 
-// CONFIGURE AQUI
+// CONFIG
 const CARGO_MEMBRO = "1472322818372010070";
 const CARGO_STAFF = "1472322818350776580";
 const CANAL_PAINEL = "1486083438753878016";
@@ -30,29 +32,24 @@ const CANAL_LOG = "1486083691586392236";
 client.once('ready', async () => {
   console.log(`Bot online como ${client.user.tag}`);
 
-  try {
-    const canal = await client.channels.fetch(CANAL_PAINEL);
+  const canal = await client.channels.fetch(CANAL_PAINEL);
 
-    const botao = new ButtonBuilder()
-      .setCustomId('registro')
-      .setLabel('📋 Fazer Registro')
-      .setStyle(ButtonStyle.Danger);
+  const botao = new ButtonBuilder()
+    .setCustomId('registro')
+    .setLabel('📋 Fazer Registro')
+    .setStyle(ButtonStyle.Danger);
 
-    const row = new ActionRowBuilder().addComponents(botao);
+  const row = new ActionRowBuilder().addComponents(botao);
 
-    await canal.send({
-      content: '🔥 TROPA DA COREIA - RECRUTAMENTO 🔥\nClique no botão para iniciar.',
-      components: [row]
-    });
-
-  } catch (err) {
-    console.log("Erro ao enviar painel:", err);
-  }
+  await canal.send({
+    content: '🔥 TROPA DA COREIA - RECRUTAMENTO 🔥\nClique no botão para iniciar.',
+    components: [row]
+  });
 });
 
 client.on(Events.InteractionCreate, async interaction => {
 
-  // BOTÃO REGISTRO
+  // BOTÃO
   if (interaction.isButton() && interaction.customId === 'registro') {
 
     const modal = new ModalBuilder()
@@ -77,7 +74,7 @@ client.on(Events.InteractionCreate, async interaction => {
     await interaction.showModal(modal);
   }
 
-  // FORMULÁRIO
+  // FORM
   if (interaction.isModalSubmit() && interaction.customId === 'form') {
 
     const nome = interaction.fields.getTextInputValue('nome');
@@ -136,5 +133,5 @@ client.on(Events.InteractionCreate, async interaction => {
 
 });
 
-// 🔥 IMPORTANTE (DEIXA SÓ ISSO)
+// LOGIN
 client.login(process.env.TOKEN);
