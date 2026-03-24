@@ -17,7 +17,7 @@ const client = new Client({
 });
 
 // CONFIGURE AQUI
-const TOKEN = "";
+client.login(process.env.TOKEN);
 const CARGO_MEMBRO = "1472322818372010070";
 const CARGO_STAFF = "1472322818350776580";
 const CANAL_PAINEL = "1486083438753878016";
